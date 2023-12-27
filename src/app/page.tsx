@@ -1,113 +1,98 @@
-import Image from 'next/image'
+"use client"
 
-export default function Home() {
+import { useState } from 'react';
+import powerdImage from './assets/powered.png';
+import { levels, calculateImc, Level } from './helpers/imc';
+import leftArrowImage from '@/app/assets/leftarrow.png';
+import { GridItem } from '@/components/GridItem';
+
+
+const Page = () => {
+  const [heightFied, setHeightField] = useState<number>(0);
+  const [weightField, setWeightField] = useState<number>(0);
+  const [toShow, setToShow] = useState<Level | null>(null)
+
+  const handleCalculateButton = () => {
+    if(heightFied && weightField) {
+      setToShow(calculateImc(heightFied, weightField))
+    }else {
+      alert('Digite todos os campos');
+    }
+  }
+
+  const handleBackButton = () => {
+    setToShow(null);
+    setHeightField(0);
+    setWeightField(0);
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div>
+      <header>
+        <div className='max-w-4xl my-10 mx-auto pl-6 sm:pl-0 md:pl-6 lg:pl-0 '>
+          <img src={powerdImage.src} width={150}/>
+        </div>
+      </header>
+      <div className='container flex flex-col pl-6 sm:flex-row sm:pl-0 md:pl-6 lg:pl-0 max-w-4xl m-auto'>
+        <div className='flex-1 mr-4'>
+          <h1 className='text-4xl text-gray-800 mb-6 font-bold'>Calcule seu IMC.</h1>
+          <p className='text-base mb-10 text-gray-600'>IMC é a sigle para índice de Massa Corpórea, parámetro adotado pela Organização Mundial de Saúde para calcular o peso ideal de cada pessoa.</p>
+        
+          <input 
+            type="number"
+            placeholder='Digite a sua altura. Ex: 1.5 (em métros)'
+            className='w-full border-0 border-b-2 border-gray-600 py-3 px-1 mb-5 text-base outline-0'
+            value={heightFied > 0 ? heightFied : ''}
+            onChange={e => setHeightField(parseFloat(e.target.value))}
+            disabled={toShow ? true : false}
+          />
+
+          <input 
+            type="number"
+            placeholder='Digite 0 seu peso. Ex: 60 (em Kg)'
+            className='w-full border-0 border-b-2 border-gray-600 py-3 px-1 mb-5 text-base outline-0'
+            value={weightField > 0 ? weightField : ''}
+            onChange={e => setWeightField(parseFloat(e.target.value))}
+            disabled={toShow ? true : false}
+          />
+
+          <button 
+            onClick={handleCalculateButton}
+            disabled={toShow ? true : false}
+            className='
+            bg-blue-500 text-white text-[15px] border-0 
+              rounded-xl py-3 px-0 w-full cursor-pointer my-10 
+              hover:opacity-80 transition-all duration-3000 ease-in-out
+              disabled:opacity-50'  
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            Calcular
+          </button>
+        </div>
+        <div className='flex-1 sm:m-0 flex mb-10'>
+          {!toShow &&
+            <div className='flex-1 grid grid-cols-2 gap-5 mr-6'>
+              {levels.map((item, key) => (
+                <GridItem key={key} item={item}/>
+              ))}
+            </div>
+          }
+          {toShow && 
+            <div className='flex-1 flex mr-4 md:mr-4 md:ml-8'>
+              <div 
+                className='absolute bg-[#227C9D] w-16 h-16 rounded-[50%] flex justify-center 
+                           items-center cursor-pointer ml-[-10px] mt-[-10px] md:ml-[-35px] md:mt-[165px]
+                           hover:opacity-80 transition-all duration-3000 ease-in-out'
+               onClick={handleBackButton}
+              >
+                <img src={leftArrowImage.src} width={25} />
+              </div>
+              <GridItem item={toShow}/>
+            </div>
+          }       
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   )
 }
+
+export default Page;
